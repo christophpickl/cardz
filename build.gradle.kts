@@ -9,4 +9,5 @@ plugins {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
+    implementation("com.itextpdf:itextpdf:5.5.13.1")
 }
