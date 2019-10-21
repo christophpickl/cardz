@@ -19,12 +19,14 @@ object CardzApp {
     private const val FONT_SIZE = 12.0F
     private const val CARDS_X_PER_PAGE = 2
     private const val CARDS_Y_PER_PAGE = 4
+    private const val lineHeight = 18.0F
+    private const val MAX_LINES = 7
 
     @JvmStatic
     fun main(args: Array<String>) {
         generate(
             target = File("cardz/build/out.pdf"),
-            sentences = 1.rangeTo(15).map { "This is card number $it." }
+            sentences = DatingCards.cards
         )
     }
 
@@ -92,9 +94,15 @@ object CardzApp {
 
                 canvas.setFontAndSize(font, FONT_SIZE)
                 canvas.beginText()
-                canvas.showTextAligned(PdfContentByte.ALIGN_LEFT, card.text,
-                    lowerLeftX + 10.0F, lowerLeftY - 30.0F,
-                    0.0F)
+                splitLines(card.text).also { lines ->
+                    require(lines.size <= MAX_LINES) {
+                        "Maximum lines is $MAX_LINES but was ${lines.size} for: '${lines.joinToString("")}'"
+                    }
+                }.forEachIndexed { index, line ->
+                    canvas.showTextAligned(PdfContentByte.ALIGN_LEFT, line,
+                        lowerLeftX + 10.0F, lowerLeftY - 30.0F - (index * lineHeight),
+                        0.0F)
+                }
                 canvas.endText()
             }
 
@@ -102,6 +110,26 @@ object CardzApp {
                 document.newPage()
             }
         }
+    }
+
+    private fun splitLines(text: String): List<String> {
+        var textRest = text
+        val lines = mutableListOf<String>()
+        val cardContentWidth = CARD_WIDTH - (2 * CARD_GAP)
+        fun textIsTooLong(testText: String) = font.getWidthPoint(testText, FONT_SIZE) > cardContentWidth
+        while (textIsTooLong(textRest)) {
+            var currentLine = textRest
+            while (textIsTooLong(currentLine)) {
+                currentLine = currentLine.dropLast(1)
+            }
+            while (!currentLine.endsWith(' ')) {
+                currentLine = currentLine.dropLast(1)
+            }
+            lines += currentLine
+            textRest = textRest.substring(currentLine.length)
+        }
+        lines += textRest
+        return lines
     }
 }
 
