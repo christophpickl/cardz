@@ -19,10 +19,12 @@ object CardzApp {
 
     @JvmStatic
     fun main(args: Array<String>) {
+        val pdf = File("cardz/build/out.pdf")
         generate(
-            target = File("cardz/build/out.pdf"),
+            target = pdf,
             sentences = DatingCards.cards
         )
+        ProcessBuilder("open", pdf.canonicalPath).start().waitFor()
     }
 
     private fun generate(target: File, sentences: List<String>) {
