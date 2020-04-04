@@ -2,6 +2,7 @@ package com.github.christophpickl.cardz
 
 import com.github.christophpickl.cardz.source.Source
 import com.itextpdf.text.Document
+import com.itextpdf.text.Image
 import com.itextpdf.text.Rectangle
 import com.itextpdf.text.pdf.PdfContentByte
 import com.itextpdf.text.pdf.PdfWriter
@@ -16,6 +17,7 @@ object PdfCreator {
     private const val lineHeight = 18.0F
     private const val MAX_LINES = 7
     private const val textPaddingTopSoTextReachesTopLineOfRectangle = 14.0F
+    private val decorationImage = Image.getInstance(javaClass.getResource("/decoration.jpg"))
 
     fun generate(target: File, source: Source) {
         val document = Document()
@@ -45,6 +47,9 @@ object PdfCreator {
 
         canvas.drawCardBorder(lowerLeftX, lowerLeftY)
         canvas.drawCardText(card.text, lowerLeftX, lowerLeftY)
+
+        decorationImage.setAbsolutePosition(lowerLeftX + 18.0F, lowerLeftY - 150.0F)
+        add(decorationImage)
     }
 
     private fun PdfContentByte.drawCardBorder(lowerLeftX: Float, lowerLeftY: Float) {
