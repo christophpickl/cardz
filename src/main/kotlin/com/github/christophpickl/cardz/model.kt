@@ -8,7 +8,7 @@ object Constants {
     const val CARD_WIDTH = 260.0F
     const val FONT_SIZE = 12.0F
 
-    val font: BaseFont = BaseFont.createFont()
+    val font: BaseFont = BaseFont.createFont("JosefinSans-Regular.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED)//.createFont()
 
 }
 
