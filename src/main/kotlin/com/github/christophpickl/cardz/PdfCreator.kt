@@ -15,7 +15,6 @@ object PdfCreator {
     private const val CARD_HEIGHT = 160.0F
     private const val lineHeight = 18.0F
     private const val MAX_LINES = 7
-    private const val textPaddingLeft = 10.0F
     private const val textPaddingTopSoTextReachesTopLineOfRectangle = 14.0F
 
     fun generate(target: File, source: Source) {
@@ -61,18 +60,19 @@ object PdfCreator {
         rect.borderWidth = 1.0F
         rectangle(rect)
     }
+
     private fun PdfContentByte.drawCardText(text: String, lowerLeftX: Float, lowerLeftY: Float) {
-        setFontAndSize(Constants.font, Constants.FONT_SIZE)
-        beginText()
         val lines = SourceTransformer.splitLines(text)
         require(lines.size <= MAX_LINES) {
             "Maximum lines is $MAX_LINES but was ${lines.size} for: '${lines.joinToString("")}'"
         }
-
         val verticalAlignmentAddition = (CARD_HEIGHT - lines.size * lineHeight) / 2.0F
+
+        setFontAndSize(Constants.font, Constants.FONT_SIZE)
+        beginText()
         lines.forEachIndexed { index, line ->
-            showTextAligned(PdfContentByte.ALIGN_LEFT, line,
-                lowerLeftX + textPaddingLeft,
+            showTextAligned(PdfContentByte.ALIGN_CENTER, line,
+                lowerLeftX + Constants.CARD_WIDTH / 2,
                 lowerLeftY - textPaddingTopSoTextReachesTopLineOfRectangle - (index * lineHeight) - verticalAlignmentAddition,
                 0.0F)
         }
