@@ -19,61 +19,65 @@ object PdfCreator {
     private const val textPaddingTopSoTextReachesTopLineOfRectangle = 14.0F
 
     fun generate(target: File, source: Source) {
-        println("Generating Cardz PDF ...")
         val document = Document()
         val writer = PdfWriter.getInstance(document, FileOutputStream(target))
         document.open()
         val canvas = writer.directContent
         fillPdf(document, canvas, SourceTransformer.transform(source))
         document.close()
-        println("Written PDF to: ${target.canonicalPath}")
     }
 
     private fun fillPdf(document: Document, canvas: PdfContentByte, pages: List<Page>) {
-        val top = document.top() // top: 806.0
-        val right = document.right() // right: 559.0
-
         pages.forEachIndexed { index, page ->
-
             page.cards.forEach { card ->
-                val indexX = card.index.first
-                val indexY = card.index.second
-
-                val lowerLeftX = PAGE_GAP_LEFT + (indexX * (Constants.CARD_WIDTH + Constants.CARD_GAP))
-                val lowerLeftY = top - PAGE_GAP_TOP - (indexY * (CARD_HEIGHT + Constants.CARD_GAP))
-                val rect = Rectangle(
-                    // lower left X/Y
-                    lowerLeftX,
-                    lowerLeftY,
-                    // upper right X/Y
-                    lowerLeftX + Constants.CARD_WIDTH,
-                    lowerLeftY - CARD_HEIGHT
-                )
-                rect.border = Rectangle.BOX
-                rect.borderWidth = 1.0F
-                canvas.rectangle(rect)
-
-                canvas.setFontAndSize(Constants.font, Constants.FONT_SIZE)
-                canvas.beginText()
-                val lines = SourceTransformer.splitLines(card.text)
-                require(lines.size <= MAX_LINES) {
-                    "Maximum lines is ${MAX_LINES} but was ${lines.size} for: '${lines.joinToString("")}'"
-                }
-
-                val verticalAlignmentAddition = (CARD_HEIGHT - lines.size * lineHeight) / 2.0F
-                lines.forEachIndexed { index, line ->
-                    canvas.showTextAligned(PdfContentByte.ALIGN_LEFT, line,
-                        lowerLeftX + textPaddingLeft,
-                        lowerLeftY - textPaddingTopSoTextReachesTopLineOfRectangle - (index * lineHeight) - verticalAlignmentAddition,
-                        0.0F)
-                }
-                canvas.endText()
+                document.drawCard(card, canvas)
             }
-
             if (index != pages.size - 1) {
                 document.newPage()
             }
         }
     }
+
+    private fun Document.drawCard(card: CardRect, canvas: PdfContentByte) {
+        val indexX = card.index.first
+        val indexY = card.index.second
+        val lowerLeftX = PAGE_GAP_LEFT + (indexX * (Constants.CARD_WIDTH + Constants.CARD_GAP))
+        val lowerLeftY = top() - PAGE_GAP_TOP - (indexY * (CARD_HEIGHT + Constants.CARD_GAP))
+
+        canvas.drawCardBorder(lowerLeftX, lowerLeftY)
+        canvas.drawCardText(card.text, lowerLeftX, lowerLeftY)
+    }
+
+    private fun PdfContentByte.drawCardBorder(lowerLeftX: Float, lowerLeftY: Float) {
+        val rect = Rectangle(
+            // lower left X/Y
+            lowerLeftX,
+            lowerLeftY,
+            // upper right X/Y
+            lowerLeftX + Constants.CARD_WIDTH,
+            lowerLeftY - CARD_HEIGHT
+        )
+        rect.border = Rectangle.BOX
+        rect.borderWidth = 1.0F
+        rectangle(rect)
+    }
+    private fun PdfContentByte.drawCardText(text: String, lowerLeftX: Float, lowerLeftY: Float) {
+        setFontAndSize(Constants.font, Constants.FONT_SIZE)
+        beginText()
+        val lines = SourceTransformer.splitLines(text)
+        require(lines.size <= MAX_LINES) {
+            "Maximum lines is $MAX_LINES but was ${lines.size} for: '${lines.joinToString("")}'"
+        }
+
+        val verticalAlignmentAddition = (CARD_HEIGHT - lines.size * lineHeight) / 2.0F
+        lines.forEachIndexed { index, line ->
+            showTextAligned(PdfContentByte.ALIGN_LEFT, line,
+                lowerLeftX + textPaddingLeft,
+                lowerLeftY - textPaddingTopSoTextReachesTopLineOfRectangle - (index * lineHeight) - verticalAlignmentAddition,
+                0.0F)
+        }
+        endText()
+    }
+
 
 }

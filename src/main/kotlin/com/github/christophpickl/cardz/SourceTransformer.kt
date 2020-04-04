@@ -3,28 +3,27 @@ package com.github.christophpickl.cardz
 import com.github.christophpickl.cardz.source.Source
 import kotlin.math.ceil
 
+
 object SourceTransformer {
 
-    private const val CARDS_X_PER_PAGE = 2
-    private const val CARDS_Y_PER_PAGE = 4
+    private const val cardsCountX = 2
+    private const val cardsCountY = 4
+    private const val cardsPerPage = cardsCountX * cardsCountY
 
     fun transform(source: Source): List<Page> {
-        val cardsPerPage = CARDS_X_PER_PAGE * CARDS_Y_PER_PAGE
-        val pagesCount: Int = ceil(source.sentences.size.toDouble() / cardsPerPage).toInt()
-
         var leftoverSentences = source.sentences.toMutableList()
         val pages = mutableListOf<Page>()
-        1.rangeTo(pagesCount).forEach {
+        repeat(source.pagesCount) {
             var currentX = 0
             var currentY = 0
             val cards = mutableListOf<CardRect>()
 
-            val takeCards = leftoverSentences.take(cardsPerPage)
-            leftoverSentences = leftoverSentences.subList(takeCards.size, leftoverSentences.size)
-            takeCards.forEach { sentence ->
+            val sentencesForThisPage = leftoverSentences.take(cardsPerPage)
+            leftoverSentences = leftoverSentences.subList(sentencesForThisPage.size, leftoverSentences.size)
+            sentencesForThisPage.forEach { sentence ->
                 cards += CardRect(currentX to currentY, sentence)
                 currentX++
-                if (currentX > CARDS_X_PER_PAGE - 1) {
+                if (currentX > cardsCountX - 1) {
                     currentX = 0
                     currentY++
                 }
@@ -34,6 +33,8 @@ object SourceTransformer {
         }
         return pages
     }
+
+    private val Source.pagesCount get() = ceil(sentences.size.toDouble() / cardsPerPage).toInt()
 
     fun splitLines(text: String): List<String> {
         var textRest = text

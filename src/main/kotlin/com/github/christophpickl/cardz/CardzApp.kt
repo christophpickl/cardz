@@ -10,6 +10,7 @@ object CardzApp {
         val source = Sources.conversation
         val pdf = File("cardz-${source.fileTitle}.pdf")
         PdfCreator.generate(target = pdf, source = source)
+        println("Written PDF to: ${pdf.canonicalPath}")
         open(pdf)
     }
 
