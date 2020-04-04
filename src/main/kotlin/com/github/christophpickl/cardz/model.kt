@@ -11,3 +11,12 @@ object Constants {
     val font: BaseFont = BaseFont.createFont()
 
 }
+
+data class Page(
+    val cards: List<CardRect>
+)
+
+data class CardRect(
+    val index: Pair<Int, Int>,
+    val text: String
+)

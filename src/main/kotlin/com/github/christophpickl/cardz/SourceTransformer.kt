@@ -1,17 +1,18 @@
 package com.github.christophpickl.cardz
 
+import com.github.christophpickl.cardz.source.Source
 import kotlin.math.ceil
 
-object ContentPreparer {
+object SourceTransformer {
 
     private const val CARDS_X_PER_PAGE = 2
     private const val CARDS_Y_PER_PAGE = 4
 
-    fun transform(sentences: List<String>): List<Page> {
+    fun transform(source: Source): List<Page> {
         val cardsPerPage = CARDS_X_PER_PAGE * CARDS_Y_PER_PAGE
-        val pagesCount: Int = ceil(sentences.size.toDouble() / cardsPerPage).toInt()
+        val pagesCount: Int = ceil(source.sentences.size.toDouble() / cardsPerPage).toInt()
 
-        var leftoverSentences = sentences.toMutableList()
+        var leftoverSentences = source.sentences.toMutableList()
         val pages = mutableListOf<Page>()
         1.rangeTo(pagesCount).forEach {
             var currentX = 0

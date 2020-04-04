@@ -1,12 +1,15 @@
-package com.github.christophpickl.cardz
+package com.github.christophpickl.cardz.source
 
 /*
+by my friend alain :)
+
 1. design to retrieve key pieces of information, but are mild and non-contentious
 2. the evening is processing and heading towards the more revealing, more truthful and more frightening (in a good way)
 3. probe at the deep self, reveal vulnerabilities and intimate details about ourselves; provoke both embarrassment and a welcome sense of mutual revelation
  */
-object DatingCards {
-    val cards = listOf(
+object Dating : Source {
+    override val fileTitle = "dating"
+    override val sentences = listOf(
         "What do people seldom properly understand about you?",
         "What is your most irritating work colleague like?",
         "What is your 'type'?",
